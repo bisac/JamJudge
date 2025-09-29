@@ -1,11 +1,11 @@
 # JamJudge – wymagania biznesowe
 
-## 🎯 Cel projektu
+## Cel projektu
 
 JamJudge to platforma do obsługi hackathonów i jamów projektowych.
 Umożliwia uczestnikom rejestrację zespołów i zgłaszanie projektów, jurorom – ocenianie według ustalonych kryteriów, a organizatorom – sprawne zarządzanie wydarzeniem i publikację wyników.
 
-## ✅ Wymagania funkcjonalne
+## Wymagania funkcjonalne
 
 ### Role użytkowników
 
@@ -52,7 +52,7 @@ Umożliwia uczestnikom rejestrację zespołów i zgłaszanie projektów, jurorom
 - Filtry po kategoriach, tagach.
 - Karta projektu z opisem i materiałami.
 
-## 📋 Wymagania niefunkcjonalne
+## Wymagania niefunkcjonalne
 
 - **Dostępność czasowa** – system działa 24/7, szczególnie w dniach wydarzenia.
 - **Wydajność** – obsługa co najmniej kilkuset użytkowników jednocześnie.
@@ -66,7 +66,7 @@ Umożliwia uczestnikom rejestrację zespołów i zgłaszanie projektów, jurorom
 - **Rzetelność wyników** – brak możliwości manipulacji ocenami.
 - **Raportowanie** – możliwość generowania wyników i statystyk.
 
-## 🛠️ Stack technologiczny
+## Stack technologiczny
 
 Do realizacji projektu zostanie wykorzystany nowoczesny, szybki i skalowalny zestaw technologii:
 

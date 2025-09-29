@@ -256,6 +256,21 @@
 - ⏳ Monitoring i logi
 - **Test**: Automatyczny deployment działa bez błędów
 
+## ETAP 11: Jakość i Wdrożenie
+
+### 11.1 Testy End-to-End 👤
+- ⏳ Zdefiniowanie kluczowych scenariuszy testowych (np. rejestracja, zgłoszenie projektu).
+- ⏳ Wybór i konfiguracja narzędzia do testów E2E (np. Cypress, Playwright).
+- ⏳ Implementacja co najmniej jednego testu weryfikującego ścieżkę użytkownika.
+- **Test**: Test przechodzi pomyślnie lokalnie.
+
+### 11.2 Konfiguracja CI/CD 🤖
+- ⏳ Utworzenie pliku workflow dla GitHub Actions.
+- ⏳ Zdefiniowanie kroków: checkout, instalacja zależności, budowanie aplikacji.
+- ⏳ Dodanie kroku uruchamiającego testy.
+- ⏳ (Opcjonalnie) Konfiguracja automatycznego deploymentu na Firebase Hosting.
+- **Test**: Pipeline uruchamia się poprawnie po pushu do repozytorium i wszystkie kroki przechodzą pomyślnie.
+
 ---
 
 ## Notatki implementacyjne
@@ -280,25 +295,3 @@
 - Audyt bezpieczeństwa
 - Konfiguracja CI/CD pipelines
 
----
-
-# Lista zadań - JamJudge
-
-- [ ] Implementacja testów weryfikujących działanie aplikacji (co najmniej jeden test z perspektywy użytkownika).
-- [ ] Konfiguracja pipeline'u CI/CD w GitHub Actions do automatycznego budowania i uruchamiania testów.
----
-
-## ETAP 5: Jakość i Wdrożenie
-
-### 5.1 Testy End-to-End 👤
-- ⏳ Zdefiniowanie kluczowych scenariuszy testowych (np. rejestracja, zgłoszenie projektu).
-- ⏳ Wybór i konfiguracja narzędzia do testów E2E (np. Cypress, Playwright).
-- ⏳ Implementacja co najmniej jednego testu weryfikującego ścieżkę użytkownika.
-- **Test**: Test przechodzi pomyślnie lokalnie.
-
-### 5.2 Konfiguracja CI/CD 🤖
-- ⏳ Utworzenie pliku workflow dla GitHub Actions.
-- ⏳ Zdefiniowanie kroków: checkout, instalacja zależności, budowanie aplikacji.
-- ⏳ Dodanie kroku uruchamiającego testy.
-- ⏳ (Opcjonalnie) Konfiguracja automatycznego deploymentu na Firebase Hosting.
-- **Test**: Pipeline uruchamia się poprawnie po pushu do repozytorium i wszystkie kroki przechodzą pomyślnie.
