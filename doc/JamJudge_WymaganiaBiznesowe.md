@@ -17,37 +17,44 @@ Umożliwia uczestnikom rejestrację zespołów i zgłaszanie projektów, jurorom
 ### Obszary funkcjonalne
 
 #### Zarządzanie wydarzeniem
+
 - Tworzenie wydarzeń z opisem, regulaminem i harmonogramem.
 - Definiowanie terminów (rejestracja, zgłoszenia, oceny, wyniki).
 - Definiowanie kryteriów oceny (np. Innowacyjność, Wykonanie, UX).
 
 #### Rejestracja uczestników i zespołów
+
 - Tworzenie zespołu i zapraszanie członków.
 - Edycja danych zespołu do momentu zgłoszenia projektu.
 
 #### Zgłaszanie projektów
+
 - Formularz projektu (opis, repozytorium, demo, multimedia).
 - Możliwość edycji do momentu ostatecznego zgłoszenia lub deadline'u.
 - Blokada edycji po wysłaniu.
 
 #### Ocena projektów
+
 - Jury wystawia oceny wg kryteriów.
 - Każde kryterium oceniane w skali (np. 0–10).
 - Automatyczne obliczanie wyniku łącznego (średnia ważona).
 - Widok rankingowy projektów po zakończeniu ocen.
 
 #### Komentarze i feedback
+
 - Komentarze publiczne widoczne dla zespołu.
 - Komentarze prywatne (jury ↔ jury, mentor ↔ mentor).
 - Możliwość prowadzenia wątków dyskusyjnych przy projekcie.
 
 #### Panel organizatora
+
 - Zarządzanie wydarzeniem, kryteriami, rolami i użytkownikami.
 - Podgląd zgłoszeń, postępów ocen, statystyk.
 - Eksport wyników i ocen (np. CSV/PDF).
 - Możliwość publikacji wyników na stronie wydarzenia.
 
 #### Publiczny katalog projektów (opcjonalnie)
+
 - Lista wszystkich zgłoszeń w danym wydarzeniu.
 - Filtry po kategoriach, tagach.
 - Karta projektu z opisem i materiałami.
@@ -71,18 +78,22 @@ Umożliwia uczestnikom rejestrację zespołów i zgłaszanie projektów, jurorom
 Do realizacji projektu zostanie wykorzystany nowoczesny, szybki i skalowalny zestaw technologii:
 
 ### Frontend:
+
 - **React + TypeScript** – szybki rozwój i bezpieczeństwo typów,
 - **Ant Design** – spójny i estetyczny zestaw komponentów UI.
 
 ### Backend i baza danych:
+
 - **Firebase** (Firestore, Auth, Cloud Functions, Storage) – serwerless, skalowalne i proste w utrzymaniu środowisko,
 - **Firebase Hosting** – szybkie i bezpieczne hostowanie aplikacji.
 
 ### CI/CD i jakość:
+
 - **GitHub Actions** – automatyzacja buildów, testów i deploymentu,
 - Zintegrowane testy jednostkowe i end-to-end,
 - Repozytorium kodu w GitHub z kontrolą wersji.
 
 ### Środowisko pracy:
+
 - **Node.js** (do uruchamiania narzędzi i funkcji backendowych),
 - narzędzia developerskie: linting, formatowanie kodu, testy automatyczne.
