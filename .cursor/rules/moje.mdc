@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+## Stos technologiczny (wymagany)
+- React + TypeScript + Vite.
+- Ant Design (spójność stylu AntD).
+- Firebase modular SDK: Auth, Firestore, Storage.
+
+## UX/UI
+- Używaj komponentów AntD; podstawowa responsywność „mobile‑first”.
+- Zachowaj domyślną typografię i kolorystykę AntD; bez custom designu na MVP.
+
+## Dobre praktyki
+- Małe, atomowe edycje; czytelne nazwy; bez skrótów.
+- Nie łam istniejących API komponentów bez uzasadnienia.
+- Zachowuj zgodność z `TECH_GUIDELINES.md` tam, gdzie dotyczy.
+- Wszystkie komentarze po angielsku
