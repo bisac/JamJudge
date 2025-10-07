@@ -19,13 +19,6 @@ Główne role i dostęp:
 - Uczestnik: dostęp do własnego zespołu i projektu
 - Publiczny: odczyt opublikowanego rankingu po publikacji
 
-Technologia i architektura (MVP):
-
-- Frontend: React + TypeScript + Vite; komponenty Ant Design; mobile‑first
-- BaaS: Firebase Auth (e‑mail/hasło), Firestore (Event, Team, Project, Criteria, Score, Feedback), Storage (pliki)
-- Bezpieczeństwo: RBAC i Firebase Security Rules odzwierciedlające role i etapy
-- Wydajność/stabilność dnia wydarzenia: indeksy, paginacja, caching po stronie klienta
-
 Cykl życia wydarzenia (etapy): Rejestracja → Praca → Zgłoszenia → Oceny → Publikacja wyników. Twarde deadline’y; po Submit edycja zablokowana; odblokowanie tylko przez Organizatora (z audytem).
 
 ## 2. Problem użytkownika
