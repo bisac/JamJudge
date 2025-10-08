@@ -17,6 +17,8 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "antd": "^5.27.4",
+    "firebase": "^12.3.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

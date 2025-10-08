@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+## DATABASE
+
+### Guidelines for NOSQL
+
+#### FIREBASE
+
+- Use security rules to enforce access control at the database level for {{user_roles}}
+- Implement shallow queries to minimize bandwidth usage
+- Use offline capabilities for better user experience in mobile apps
