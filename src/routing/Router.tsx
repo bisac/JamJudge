@@ -54,8 +54,11 @@ const EventSettingsPage = lazy(
   () => import("../pages/organizer/EventSettingsPage"),
 );
 const UsersPage = lazy(() => import("../pages/organizer/UsersPage"));
-const AllProjectsPage = lazy(
-  () => import("../pages/organizer/AllProjectsPage"),
+const TeamsManagementPage = lazy(
+  () => import("../pages/organizer/TeamsManagementPage"),
+);
+const ProjectsManagementPage = lazy(
+  () => import("../pages/organizer/ProjectsManagementPage"),
 );
 const SettingsPage = lazy(() => import("../pages/organizer/SettingsPage"));
 
@@ -198,10 +201,18 @@ const router = createBrowserRouter([
                 ),
               },
               {
+                path: "teams",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <TeamsManagementPage />
+                  </Suspense>
+                ),
+              },
+              {
                 path: "projects",
                 element: (
                   <Suspense fallback={SuspenseFallback}>
-                    <AllProjectsPage />
+                    <ProjectsManagementPage />
                   </Suspense>
                 ),
               },
