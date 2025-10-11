@@ -403,3 +403,26 @@ export type EventId = string;
 export type TeamId = string;
 export type ProjectId = string;
 export type CriterionId = string;
+
+// ------------------------------------------------------
+// Context-specific types
+// ------------------------------------------------------
+
+export type EventStage =
+  | "registration"
+  | "work_in_progress"
+  | "submission"
+  | "rating"
+  | "finished"
+  | "unknown";
+
+export interface EventContextType {
+  event: EventDTO | null;
+  currentStage: EventStage;
+  deadlines: {
+    submission: Timestamp | null;
+    rating: Timestamp | null;
+  };
+  isLoading: boolean;
+  error: Error | null;
+}
