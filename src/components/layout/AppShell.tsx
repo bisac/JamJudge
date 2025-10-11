@@ -15,7 +15,7 @@ const { Content } = Layout;
 
 const AppShellContent: React.FC = () => {
   const { isLoading, error, event } = useEventContext();
-  const { signOut } = useAuthContext();
+  const { signOut, user } = useAuthContext();
   const navigate = useNavigate();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -34,7 +34,10 @@ const AppShellContent: React.FC = () => {
     );
   }
 
-  if (error || !event) {
+  // Allow organizers to access event settings even when no event exists
+  const isOrganizer = user?.role === "organizer";
+
+  if ((error || !event) && !isOrganizer) {
     const handleLogout = async () => {
       await signOut();
       navigate("/auth/login", { replace: true });

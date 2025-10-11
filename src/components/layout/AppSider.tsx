@@ -11,6 +11,7 @@ import {
   SettingOutlined,
   AuditOutlined,
   ScheduleOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import type { UserRole } from "../../types";
@@ -82,14 +83,24 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       <ScheduleOutlined />,
     ),
     getItem(
+      <Link to="/organizer/criteria">Criteria</Link>,
+      "/organizer/criteria",
+      <StarOutlined />,
+    ),
+    getItem(
+      <Link to="/organizer/teams">Teams</Link>,
+      "/organizer/teams",
+      <TeamOutlined />,
+    ),
+    getItem(
+      <Link to="/organizer/projects">Projects</Link>,
+      "/organizer/projects",
+      <ProjectOutlined />,
+    ),
+    getItem(
       <Link to="/organizer/users">Users</Link>,
       "/organizer/users",
       <UserSwitchOutlined />,
-    ),
-    getItem(
-      <Link to="/organizer/projects">All Projects</Link>,
-      "/organizer/projects",
-      <ProjectOutlined />,
     ),
     getItem(
       <Link to="/organizer/settings">Settings</Link>,
