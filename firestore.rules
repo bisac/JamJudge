@@ -1,0 +1,191 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUser(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+    
+    function isOrganizer() {
+      return hasRole('organizer');
+    }
+    
+    function isJury() {
+      return hasRole('jury');
+    }
+    
+    function isParticipant() {
+      return hasRole('participant');
+    }
+    
+    // ========================================
+    // USERS COLLECTION
+    // ========================================
+    match /users/{userId} {
+      // Anyone can read their own profile
+      allow read: if isUser(userId);
+      
+      // Users can create their own profile during sign up
+      allow create: if isUser(userId) && 
+                       request.resource.data.uid == userId &&
+                       request.resource.data.role == 'participant'; // Default role
+      
+      // Users can update their own displayName and photoURL
+      allow update: if isUser(userId) && 
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['displayName', 'photoURL', 'updatedAt']);
+      
+      // Only organizers can update user roles
+      allow update: if isOrganizer() && 
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['role', 'updatedAt']);
+      
+      // Organizers can read all users
+      allow read: if isOrganizer();
+    }
+    
+    // ========================================
+    // EVENTS COLLECTION
+    // ========================================
+    match /events/{eventId} {
+      // Everyone can read events
+      allow read: if true;
+      
+      // Only organizers can create/update events
+      allow create, update: if isOrganizer();
+      
+      // Only organizers can delete events
+      allow delete: if isOrganizer();
+    }
+    
+    // ========================================
+    // TEAMS COLLECTION
+    // ========================================
+    match /teams/{teamId} {
+      // Everyone can read teams
+      allow read: if true;
+      
+      // Participants can create teams
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid;
+      
+      // Team creator or organizer can update
+      allow update: if isOrganizer() || 
+                       resource.data.createdBy == request.auth.uid;
+      
+      // Only organizers can delete
+      allow delete: if isOrganizer();
+      
+      // Team members subcollection
+      match /members/{memberId} {
+        allow read: if true;
+        allow write: if isOrganizer() || 
+                        get(/databases/$(database)/documents/teams/$(teamId)).data.createdBy == request.auth.uid;
+      }
+    }
+    
+    // ========================================
+    // TEAM NAME RESERVATIONS
+    // ========================================
+    match /teamNameReservations/{nameNormalized} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow delete: if isOrganizer();
+    }
+    
+    // ========================================
+    // PROJECTS COLLECTION
+    // ========================================
+    match /projects/{projectId} {
+      // Everyone can read submitted projects
+      allow read: if resource.data.status == 'submitted' || 
+                     isOrganizer() || 
+                     isJury() ||
+                     resource.data.createdBy == request.auth.uid;
+      
+      // Team members can create projects
+      allow create: if isAuthenticated() && 
+                       request.resource.data.createdBy == request.auth.uid;
+      
+      // Team members can update their own projects (if not submitted or force unlocked)
+      allow update: if (resource.data.createdBy == request.auth.uid && 
+                        (resource.data.status == 'draft' || 
+                         resource.data.forceUnlockUntil > request.time)) ||
+                       isOrganizer();
+      
+      // Only organizers can delete
+      allow delete: if isOrganizer();
+      
+      // Project attachments subcollection
+      match /attachments/{attachmentId} {
+        allow read: if get(/databases/$(database)/documents/projects/$(projectId)).data.status == 'submitted' ||
+                       isOrganizer() ||
+                       isJury() ||
+                       get(/databases/$(database)/documents/projects/$(projectId)).data.createdBy == request.auth.uid;
+        
+        allow create: if get(/databases/$(database)/documents/projects/$(projectId)).data.createdBy == request.auth.uid;
+        
+        allow delete: if isOrganizer() ||
+                         get(/databases/$(database)/documents/projects/$(projectId)).data.createdBy == request.auth.uid;
+      }
+      
+      // Project evaluations subcollection
+      match /evaluations/{jurorId} {
+        // Jury can read their own evaluations
+        allow read: if isUser(jurorId) || isOrganizer();
+        
+        // Jury can create/update their own evaluations
+        allow write: if isUser(jurorId) && isJury();
+        
+        // Organizers can read all
+        allow read: if isOrganizer();
+      }
+    }
+    
+    // ========================================
+    // CRITERIA COLLECTION
+    // ========================================
+    match /criteria/{criterionId} {
+      // Everyone can read criteria
+      allow read: if true;
+      
+      // Only organizers can create/update/delete
+      allow write: if isOrganizer();
+    }
+    
+    // ========================================
+    // PUBLIC RESULTS COLLECTION
+    // ========================================
+    match /publicResults/{resultId} {
+      // Everyone can read public results
+      allow read: if true;
+      
+      // Only organizers can write (through Cloud Functions ideally)
+      allow write: if isOrganizer();
+    }
+    
+    // ========================================
+    // AUDIT LOG COLLECTION
+    // ========================================
+    match /auditLog/{logId} {
+      // Only organizers can read audit logs
+      allow read: if isOrganizer();
+      
+      // System/Cloud Functions write audit logs
+      // In production, this should be write: if false and handled by Cloud Functions
+      allow create: if isAuthenticated();
+    }
+  }
+}
+

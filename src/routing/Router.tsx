@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
 import RequireAuth from "./RequireAuth";
+import RedirectIfAuthenticated from "./RedirectIfAuthenticated";
 import { Spin } from "antd";
 
 // A reusable fallback component for Suspense
@@ -25,6 +26,11 @@ const SuspenseFallback = (
 // Public and Auth pages
 const LandingPage = lazy(() => import("../pages/public/LandingPage"));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
+const SignUpPage = lazy(() => import("../pages/auth/SignUpPage"));
+const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPasswordPage"));
+
+// Layout for auth pages
+import AuthLayout from "../components/layout/AuthLayout";
 
 // Participant pages
 const ParticipantDashboard = lazy(
@@ -63,12 +69,39 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/auth/login",
-    element: (
-      <Suspense fallback={SuspenseFallback}>
-        <LoginPage />
-      </Suspense>
-    ),
+    path: "/auth",
+    element: <RedirectIfAuthenticated />,
+    children: [
+      {
+        element: <AuthLayout />,
+        children: [
+          {
+            path: "login",
+            element: (
+              <Suspense fallback={SuspenseFallback}>
+                <LoginPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "sign-up",
+            element: (
+              <Suspense fallback={SuspenseFallback}>
+                <SignUpPage />
+              </Suspense>
+            ),
+          },
+          {
+            path: "reset",
+            element: (
+              <Suspense fallback={SuspenseFallback}>
+                <ResetPasswordPage />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+    ],
   },
   {
     element: <RequireAuth />,
