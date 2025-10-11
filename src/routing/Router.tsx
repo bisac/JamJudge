@@ -61,6 +61,9 @@ const ProjectsManagementPage = lazy(
   () => import("../pages/organizer/ProjectsManagementPage"),
 );
 const SettingsPage = lazy(() => import("../pages/organizer/SettingsPage"));
+const CriteriaConfigPage = lazy(
+  () => import("../pages/organizer/CriteriaConfigPage"),
+);
 
 const router = createBrowserRouter([
   {
@@ -189,6 +192,14 @@ const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={SuspenseFallback}>
                     <EventSettingsPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "criteria",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <CriteriaConfigPage />
                   </Suspense>
                 ),
               },

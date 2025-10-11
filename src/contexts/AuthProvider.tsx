@@ -21,7 +21,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[AuthProvider] Initializing auth listener");
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      console.log(
+        "[AuthProvider] Auth state changed - user:",
+        user?.uid || "null",
+      );
       setFirebaseUser(user);
       if (!user) {
         setUserProfile(null);
@@ -34,27 +39,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (firebaseUser) {
+      console.log(
+        "[AuthProvider] Setting up profile listener for:",
+        firebaseUser.uid,
+      );
       const userDocRef = doc(db, "users", firebaseUser.uid);
       const unsubscribeProfile = onSnapshot(
         userDocRef,
         (docSnap) => {
           if (docSnap.exists()) {
-            setUserProfile({
+            const profile = {
               uid: docSnap.id,
               ...docSnap.data(),
-            } as UserProfileDTO);
+            } as UserProfileDTO;
+            console.log(
+              "[AuthProvider] Profile loaded - role:",
+              profile.role,
+              "displayName:",
+              profile.displayName,
+            );
+            setUserProfile(profile);
           } else {
             // Handle case where user exists in Auth but not in Firestore
             // Set user profile to null - this will be handled by RequireAuth
             console.warn(
-              "User profile not found in Firestore. User may need activation.",
+              "[AuthProvider] User profile not found in Firestore. User may need activation.",
             );
             setUserProfile(null);
           }
           setIsLoading(false);
         },
         (error) => {
-          console.error("Error fetching user profile:", error);
+          console.error("[AuthProvider] Error fetching user profile:", error);
           // In case of error, set profile to null
           setUserProfile(null);
           setIsLoading(false);
