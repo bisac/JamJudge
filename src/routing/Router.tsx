@@ -3,10 +3,12 @@ import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
+  Outlet,
 } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
 import RequireAuth from "./RequireAuth";
 import RedirectIfAuthenticated from "./RedirectIfAuthenticated";
+import { NavigationProvider } from "../contexts/NavigationProvider";
 import { Spin } from "antd";
 
 // A reusable fallback component for Suspense
@@ -23,8 +25,18 @@ const SuspenseFallback = (
   </div>
 );
 
+// Wrapper component for NavigationProvider
+const NavigationWrapper = () => {
+  return (
+    <NavigationProvider>
+      <Outlet />
+    </NavigationProvider>
+  );
+};
+
 // Public and Auth pages
 const LandingPage = lazy(() => import("../pages/public/LandingPage"));
+const LeaderboardPage = lazy(() => import("../pages/public/LeaderboardPage"));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 const SignUpPage = lazy(() => import("../pages/auth/SignUpPage"));
 const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPasswordPage"));
@@ -38,6 +50,9 @@ const ParticipantDashboard = lazy(
 );
 const TeamPage = lazy(() => import("../pages/participant/TeamPage"));
 const ProjectPage = lazy(() => import("../pages/participant/ProjectPage"));
+const ParticipantSettingsPage = lazy(
+  () => import("../pages/participant/SettingsPage"),
+);
 
 // Jury pages
 const JuryDashboard = lazy(() => import("../pages/jury/JuryDashboard"));
@@ -45,6 +60,10 @@ const ProjectsToRatePage = lazy(
   () => import("../pages/jury/ProjectsToRatePage"),
 );
 const ResultsPage = lazy(() => import("../pages/jury/ResultsPage"));
+const JurySettingsPage = lazy(() => import("../pages/jury/SettingsPage"));
+const ProjectEvaluationPage = lazy(
+  () => import("../pages/jury/ProjectEvaluationPage"),
+);
 
 // Organizer pages
 const OrganizerDashboard = lazy(
@@ -79,6 +98,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={SuspenseFallback}>
         <LandingPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/leaderboard",
+    element: (
+      <Suspense fallback={SuspenseFallback}>
+        <LeaderboardPage />
       </Suspense>
     ),
   },
@@ -118,162 +145,191 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <RequireAuth />,
+    element: <NavigationWrapper />,
     children: [
       {
-        element: <AppShell />,
+        element: <RequireAuth />,
         children: [
           {
-            path: "participant",
+            element: <AppShell />,
             children: [
-              { index: true, element: <Navigate to="dashboard" replace /> },
               {
-                path: "dashboard",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ParticipantDashboard />
-                  </Suspense>
-                ),
+                path: "participant",
+                children: [
+                  { index: true, element: <Navigate to="dashboard" replace /> },
+                  {
+                    path: "dashboard",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ParticipantDashboard />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "team",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <TeamPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "project",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ProjectPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "settings",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ParticipantSettingsPage />
+                      </Suspense>
+                    ),
+                  },
+                ],
               },
               {
-                path: "team",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <TeamPage />
-                  </Suspense>
-                ),
+                path: "jury",
+                children: [
+                  { index: true, element: <Navigate to="dashboard" replace /> },
+                  {
+                    path: "dashboard",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <JuryDashboard />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "projects",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ProjectsToRatePage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "projects/:projectId",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ProjectEvaluationPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "results",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ResultsPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "settings",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <JurySettingsPage />
+                      </Suspense>
+                    ),
+                  },
+                ],
               },
               {
-                path: "project",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ProjectPage />
-                  </Suspense>
-                ),
-              },
-            ],
-          },
-          {
-            path: "jury",
-            children: [
-              { index: true, element: <Navigate to="dashboard" replace /> },
-              {
-                path: "dashboard",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <JuryDashboard />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "projects",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ProjectsToRatePage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "results",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ResultsPage />
-                  </Suspense>
-                ),
-              },
-            ],
-          },
-          {
-            path: "organizer",
-            children: [
-              { index: true, element: <Navigate to="dashboard" replace /> },
-              {
-                path: "dashboard",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <OrganizerDashboard />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "event",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <EventSettingsPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "criteria",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <CriteriaConfigPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "users",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <UsersPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "teams",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <TeamsManagementPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "projects",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ProjectsManagementPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "settings",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <SettingsPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "scores",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <ScoresPreviewPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "publish",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <PublishPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "audits",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <AuditLogPage />
-                  </Suspense>
-                ),
-              },
-              {
-                path: "storage",
-                element: (
-                  <Suspense fallback={SuspenseFallback}>
-                    <StorageMonitoringPage />
-                  </Suspense>
-                ),
+                path: "organizer",
+                children: [
+                  { index: true, element: <Navigate to="dashboard" replace /> },
+                  {
+                    path: "dashboard",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <OrganizerDashboard />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "event",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <EventSettingsPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "criteria",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <CriteriaConfigPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "users",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <UsersPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "teams",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <TeamsManagementPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "projects",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ProjectsManagementPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "settings",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <SettingsPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "scores",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <ScoresPreviewPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "publish",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <PublishPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "audits",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <AuditLogPage />
+                      </Suspense>
+                    ),
+                  },
+                  {
+                    path: "storage",
+                    element: (
+                      <Suspense fallback={SuspenseFallback}>
+                        <StorageMonitoringPage />
+                      </Suspense>
+                    ),
+                  },
+                ],
               },
             ],
           },
