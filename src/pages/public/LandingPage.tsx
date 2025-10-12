@@ -3,6 +3,7 @@ import { Layout, Typography, Button, Space, Card } from "antd";
 import { TrophyOutlined, UserOutlined, TeamOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../hooks/useAuthContext";
+import { useEventContext } from "../../hooks/useEventContext";
 import type { UserRole } from "../../types";
 
 const { Content } = Layout;
@@ -25,6 +26,7 @@ const getDefaultPath = (role: UserRole): string => {
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuthContext();
+  const { event } = useEventContext();
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -38,6 +40,8 @@ const LandingPage: React.FC = () => {
   if (isLoading || user) {
     return null;
   }
+
+  const resultsPublished = event?.resultsPublishedAt;
 
   return (
     <Layout
@@ -96,7 +100,7 @@ const LandingPage: React.FC = () => {
           </Paragraph>
 
           {/* CTA Buttons */}
-          <Space size="large" style={{ marginBottom: 48 }}>
+          <Space size="large" style={{ marginBottom: 48 }} wrap>
             <Button
               type="primary"
               size="large"
@@ -126,6 +130,26 @@ const LandingPage: React.FC = () => {
             >
               Zarejestruj się
             </Button>
+            {resultsPublished && (
+              <Button
+                type="default"
+                size="large"
+                icon={<TrophyOutlined />}
+                onClick={() => navigate("/leaderboard")}
+                style={{
+                  height: 48,
+                  fontSize: 16,
+                  paddingLeft: 32,
+                  paddingRight: 32,
+                  borderRadius: 8,
+                  background: "#faad14",
+                  borderColor: "#faad14",
+                  color: "white",
+                }}
+              >
+                Zobacz Wyniki
+              </Button>
+            )}
           </Space>
 
           {/* Features */}

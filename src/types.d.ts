@@ -159,7 +159,9 @@ export type UserProfileDTO = Pick<
   | "role"
   | "createdAt"
   | "updatedAt"
->;
+> & {
+  roles?: UserRole[]; // Optional: all assigned roles for multi-role support
+};
 
 // Events → List/read events: response uses generic id (docId)
 export type EventDTO = WithId<

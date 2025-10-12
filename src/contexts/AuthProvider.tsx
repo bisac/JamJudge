@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import type { ReactNode } from "react";
 import {
   onAuthStateChanged,
@@ -135,11 +135,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     await firebaseSignOut(auth);
   };
 
+  // Calculate hasMultipleRoles dynamically
+  const hasMultipleRoles = useMemo(() => {
+    if (!userProfile) return false;
+
+    // If user has roles array with multiple roles
+    if (userProfile.roles && userProfile.roles.length > 1) {
+      return true;
+    }
+
+    // For MVP, we assume single role unless roles array exists
+    return false;
+  }, [userProfile]);
+
   const value: AuthContextType = {
     user: userProfile,
     firebaseUser,
     isLoading,
-    hasMultipleRoles: false, // Placeholder
+    hasMultipleRoles,
     login,
     signUp,
     resetPassword,

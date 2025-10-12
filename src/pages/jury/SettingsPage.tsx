@@ -14,7 +14,7 @@ import { useAuthContext } from "../../hooks/useAuthContext";
 import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "../../firebase";
 
-const OrganizerSettingsPage: React.FC = () => {
+const JurySettingsPage: React.FC = () => {
   const { user } = useAuthContext();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -80,7 +80,7 @@ const OrganizerSettingsPage: React.FC = () => {
             </Form.Item>
 
             <Form.Item label="Role">
-              <Input disabled value="Organizer" />
+              <Input disabled value="Jury" />
             </Form.Item>
 
             <Form.Item>
@@ -95,4 +95,4 @@ const OrganizerSettingsPage: React.FC = () => {
   );
 };
 
-export default OrganizerSettingsPage;
+export default JurySettingsPage;
