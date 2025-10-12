@@ -159,9 +159,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     signOut,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!isLoading && children}
-    </AuthContext.Provider>
-  );
+  // Show loading spinner only for a brief moment during initial auth check
+  // After that, let the app render even if still loading
+  if (isLoading && !firebaseUser && userProfile === null) {
+    // Only show spinner on very first load
+    return (
+      <AuthContext.Provider value={value}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontSize: "48px",
+                marginBottom: "16px",
+              }}
+            >
+              🏆
+            </div>
+            <div style={{ fontSize: "16px", color: "#666" }}>
+              Loading JamJudge...
+            </div>
+          </div>
+        </div>
+      </AuthContext.Provider>
+    );
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
-import { Layout, Typography, Button, Space, Card } from "antd";
+import React, { useEffect, useState } from "react";
+import { Layout, Typography, Button, Space, Card, Spin } from "antd";
 import { TrophyOutlined, UserOutlined, TeamOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../../hooks/useAuthContext";
-import { useEventContext } from "../../hooks/useEventContext";
-import type { UserRole } from "../../types";
+import { collection, query, limit, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import type { UserRole, EventDTO } from "../../types";
 
 const { Content } = Layout;
 const { Title, Paragraph, Text } = Typography;
@@ -25,8 +26,29 @@ const getDefaultPath = (role: UserRole): string => {
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoading } = useAuthContext();
-  const { event } = useEventContext();
+  const { user, isLoading: authLoading } = useAuthContext();
+  const [event, setEvent] = useState<EventDTO | null>(null);
+
+  // Fetch event data for results link (without EventContext)
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const eventsQuery = query(collection(db, "events"), limit(1));
+        const snapshot = await getDocs(eventsQuery);
+        if (!snapshot.empty) {
+          const eventDoc = snapshot.docs[0];
+          setEvent({
+            id: eventDoc.id,
+            ...eventDoc.data(),
+          } as EventDTO);
+        }
+      } catch (error) {
+        console.error("Error fetching event:", error);
+      }
+    };
+
+    fetchEvent();
+  }, []);
 
   // Redirect authenticated users to their dashboard
   useEffect(() => {
@@ -36,8 +58,24 @@ const LandingPage: React.FC = () => {
     }
   }, [user, navigate]);
 
-  // Don't render content if redirecting
-  if (isLoading || user) {
+  // Show loading spinner while auth is loading
+  if (authLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // Don't render content if user is logged in (redirecting)
+  if (user) {
     return null;
   }
 

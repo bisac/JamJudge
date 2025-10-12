@@ -10,8 +10,10 @@ import {
   HistogramOutline,
   SendOutline,
   SetOutline,
+  StarOutline,
 } from "antd-mobile-icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
+import { useEventContext } from "../../hooks/useEventContext";
 import type { UserRole } from "../../types";
 
 interface TabItem {
@@ -20,13 +22,13 @@ interface TabItem {
   icon: React.ReactNode;
 }
 
-const getTabs = (role: UserRole): TabItem[] => {
+const getTabs = (role: UserRole, showLeaderboard: boolean): TabItem[] => {
   switch (role) {
     case "participant":
       return [
         {
           key: "/participant/dashboard",
-          title: "Dashboard",
+          title: "Home",
           icon: <AppOutline />,
         },
         { key: "/participant/team", title: "Team", icon: <TeamOutline /> },
@@ -35,6 +37,9 @@ const getTabs = (role: UserRole): TabItem[] => {
           title: "Project",
           icon: <FileOutline />,
         },
+        ...(showLeaderboard
+          ? [{ key: "/leaderboard", title: "Board", icon: <StarOutline /> }]
+          : []),
         {
           key: "/participant/settings",
           title: "Settings",
@@ -43,13 +48,16 @@ const getTabs = (role: UserRole): TabItem[] => {
       ];
     case "jury":
       return [
-        { key: "/jury/dashboard", title: "Dashboard", icon: <AppOutline /> },
+        { key: "/jury/dashboard", title: "Home", icon: <AppOutline /> },
         { key: "/jury/projects", title: "Projects", icon: <ContentOutline /> },
         {
           key: "/jury/results",
-          title: "Results",
+          title: "Evals",
           icon: <SystemQRcodeOutline />,
         },
+        ...(showLeaderboard
+          ? [{ key: "/leaderboard", title: "Board", icon: <StarOutline /> }]
+          : []),
         {
           key: "/jury/settings",
           title: "Settings",
@@ -60,13 +68,13 @@ const getTabs = (role: UserRole): TabItem[] => {
       return [
         {
           key: "/organizer/dashboard",
-          title: "Dashboard",
+          title: "Dash",
           icon: <AppOutline />,
         },
         { key: "/organizer/teams", title: "Teams", icon: <TeamOutline /> },
         {
           key: "/organizer/projects",
-          title: "Projects",
+          title: "Proj",
           icon: <ContentOutline />,
         },
         {
@@ -87,13 +95,16 @@ const getTabs = (role: UserRole): TabItem[] => {
 
 const AppTabBar = () => {
   const { user } = useAuthContext();
+  const { event } = useEventContext();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const showLeaderboard = !!(event && event.resultsPublishedAt);
+
   const tabs = useMemo(() => {
     if (!user?.role) return [];
-    return getTabs(user.role);
-  }, [user?.role]);
+    return getTabs(user.role, showLeaderboard);
+  }, [user?.role, showLeaderboard]);
 
   const activeKey =
     tabs.find((tab) => location.pathname.startsWith(tab.key))?.key || null;
