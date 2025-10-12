@@ -178,7 +178,7 @@ service cloud.firestore {
     // ========================================
     // AUDIT LOG COLLECTION
     // ========================================
-    match /auditLog/{logId} {
+    match /audits/{auditId} {
       // Only organizers can read audit logs
       allow read: if isOrganizer();
       

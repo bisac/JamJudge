@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Layout, Menu } from "antd";
 import type { MenuProps } from "antd";
@@ -12,6 +12,10 @@ import {
   AuditOutlined,
   ScheduleOutlined,
   StarOutlined,
+  BarChartOutlined,
+  RocketOutlined,
+  FileSearchOutlined,
+  CloudServerOutlined,
 } from "@ant-design/icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import type { UserRole } from "../../types";
@@ -102,6 +106,28 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       "/organizer/users",
       <UserSwitchOutlined />,
     ),
+    getItem("Results & Finalization", "finalization", <TrophyOutlined />, [
+      getItem(
+        <Link to="/organizer/scores">Scores Preview</Link>,
+        "/organizer/scores",
+        <BarChartOutlined />,
+      ),
+      getItem(
+        <Link to="/organizer/publish">Publish Results</Link>,
+        "/organizer/publish",
+        <RocketOutlined />,
+      ),
+      getItem(
+        <Link to="/organizer/audits">Audit Log</Link>,
+        "/organizer/audits",
+        <FileSearchOutlined />,
+      ),
+      getItem(
+        <Link to="/organizer/storage">Storage Monitor</Link>,
+        "/organizer/storage",
+        <CloudServerOutlined />,
+      ),
+    ]),
     getItem(
       <Link to="/organizer/settings">Settings</Link>,
       "/organizer/settings",
@@ -130,12 +156,74 @@ const AppSider = () => {
     return getMenuItems(user.role);
   }, [user?.role]);
 
+  // Flatten all menu items including children for selectedKey calculation
+  const flattenedItems = useMemo(() => {
+    const flatten = (items: MenuItem[]): string[] => {
+      return items.flatMap((item) => {
+        if (!item) return [];
+        const keys: string[] = [item.key as string];
+        if ("children" in item && item.children) {
+          keys.push(...flatten(item.children as MenuItem[]));
+        }
+        return keys;
+      });
+    };
+    return flatten(menuItems);
+  }, [menuItems]);
+
   // Find the most specific matching key for the current location.
-  const selectedKey = menuItems
-    .map((item) => item?.key)
-    .filter((key) => location.pathname.startsWith(key as string))
-    .sort((a, b) => (b as string).length - (a as string).length)[0]
-    ?.toString();
+  const selectedKey = flattenedItems
+    .filter((key) => location.pathname.startsWith(key))
+    .sort((a, b) => b.length - a.length)[0];
+
+  // Determine if current path is in finalization section
+  const isInFinalizationSection = useMemo(() => {
+    return (
+      location.pathname.startsWith("/organizer/scores") ||
+      location.pathname.startsWith("/organizer/publish") ||
+      location.pathname.startsWith("/organizer/audits") ||
+      location.pathname.startsWith("/organizer/storage")
+    );
+  }, [location.pathname]);
+
+  // Track previous path to detect navigation changes
+  const prevPathRef = useRef(location.pathname);
+
+  // State for controlling which submenus are open (user can interact)
+  const [openKeys, setOpenKeys] = useState<string[]>(() => {
+    return isInFinalizationSection ? ["finalization"] : [];
+  });
+
+  // Update open keys ONLY when navigating TO finalization section from elsewhere
+  useEffect(() => {
+    const prevPath = prevPathRef.current;
+    const currentPath = location.pathname;
+
+    // Check if we just navigated to finalization section
+    const wasInFinalization =
+      prevPath.startsWith("/organizer/scores") ||
+      prevPath.startsWith("/organizer/publish") ||
+      prevPath.startsWith("/organizer/audits") ||
+      prevPath.startsWith("/organizer/storage");
+
+    // Only auto-open if we navigated FROM outside TO inside finalization
+    if (isInFinalizationSection && !wasInFinalization) {
+      setOpenKeys((prev) => {
+        if (!prev.includes("finalization")) {
+          return [...prev, "finalization"];
+        }
+        return prev;
+      });
+    }
+
+    // Update ref for next comparison
+    prevPathRef.current = currentPath;
+  }, [location.pathname, isInFinalizationSection]);
+
+  // Handle submenu open/close
+  const handleOpenChange = (keys: string[]) => {
+    setOpenKeys(keys);
+  };
 
   if (!user) {
     return null; // Don't render Sider if no user
@@ -146,6 +234,8 @@ const AppSider = () => {
       <Menu
         mode="inline"
         selectedKeys={selectedKey ? [selectedKey] : []}
+        openKeys={openKeys}
+        onOpenChange={handleOpenChange}
         style={{ height: "100%", borderRight: 0 }}
         items={menuItems}
       />

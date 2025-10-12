@@ -5,9 +5,10 @@ import {
   AppOutline,
   TeamOutline,
   FileOutline,
-  UserSetOutline,
   ContentOutline,
   SystemQRcodeOutline,
+  HistogramOutline,
+  SendOutline,
 } from "antd-mobile-icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import type { UserRole } from "../../types";
@@ -51,11 +52,21 @@ const getTabs = (role: UserRole): TabItem[] => {
           title: "Dashboard",
           icon: <AppOutline />,
         },
-        { key: "/organizer/users", title: "Users", icon: <UserSetOutline /> },
+        { key: "/organizer/teams", title: "Teams", icon: <TeamOutline /> },
         {
           key: "/organizer/projects",
           title: "Projects",
           icon: <ContentOutline />,
+        },
+        {
+          key: "/organizer/scores",
+          title: "Scores",
+          icon: <HistogramOutline />,
+        },
+        {
+          key: "/organizer/publish",
+          title: "Publish",
+          icon: <SendOutline />,
         },
       ];
     default:

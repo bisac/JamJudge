@@ -64,6 +64,14 @@ const SettingsPage = lazy(() => import("../pages/organizer/SettingsPage"));
 const CriteriaConfigPage = lazy(
   () => import("../pages/organizer/CriteriaConfigPage"),
 );
+const ScoresPreviewPage = lazy(
+  () => import("../pages/organizer/ScoresPreviewPage"),
+);
+const PublishPage = lazy(() => import("../pages/organizer/PublishPage"));
+const AuditLogPage = lazy(() => import("../pages/organizer/AuditLogPage"));
+const StorageMonitoringPage = lazy(
+  () => import("../pages/organizer/StorageMonitoringPage"),
+);
 
 const router = createBrowserRouter([
   {
@@ -232,6 +240,38 @@ const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={SuspenseFallback}>
                     <SettingsPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "scores",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <ScoresPreviewPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "publish",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <PublishPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "audits",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <AuditLogPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "storage",
+                element: (
+                  <Suspense fallback={SuspenseFallback}>
+                    <StorageMonitoringPage />
                   </Suspense>
                 ),
               },
