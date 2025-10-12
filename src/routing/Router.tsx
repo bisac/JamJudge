@@ -8,6 +8,7 @@ import {
 import AppShell from "../components/layout/AppShell";
 import RequireAuth from "./RequireAuth";
 import RedirectIfAuthenticated from "./RedirectIfAuthenticated";
+import JurySectionGuard from "./JurySectionGuard";
 import { NavigationProvider } from "../contexts/NavigationProvider";
 import { Spin } from "antd";
 
@@ -193,6 +194,7 @@ const router = createBrowserRouter([
               },
               {
                 path: "jury",
+                element: <JurySectionGuard />,
                 children: [
                   { index: true, element: <Navigate to="dashboard" replace /> },
                   {

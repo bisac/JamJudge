@@ -74,7 +74,7 @@ const TeamsManagementPage = () => {
               onClick={handleOpenModal}
               block={isMobile}
             >
-              {isMobile ? "Assign User" : "Assign User to Team"}
+              {isMobile ? "Assign Participant" : "Assign Participant to Team"}
             </Button>
           </div>
         </Card>

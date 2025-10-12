@@ -9,6 +9,7 @@ import {
   SystemQRcodeOutline,
   HistogramOutline,
   SendOutline,
+  SetOutline,
 } from "antd-mobile-icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
 import type { UserRole } from "../../types";
@@ -34,6 +35,11 @@ const getTabs = (role: UserRole): TabItem[] => {
           title: "Project",
           icon: <FileOutline />,
         },
+        {
+          key: "/participant/settings",
+          title: "Settings",
+          icon: <SetOutline />,
+        },
       ];
     case "jury":
       return [
@@ -43,6 +49,11 @@ const getTabs = (role: UserRole): TabItem[] => {
           key: "/jury/results",
           title: "Results",
           icon: <SystemQRcodeOutline />,
+        },
+        {
+          key: "/jury/settings",
+          title: "Settings",
+          icon: <SetOutline />,
         },
       ];
     case "organizer":

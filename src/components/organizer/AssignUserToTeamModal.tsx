@@ -80,10 +80,13 @@ const AssignUserToTeamModal = ({
         ...doc.data(),
       })) as UserProfileDTO[];
 
+      // Filter users by role (only participants can be assigned to teams)
+      // and by search term (email or displayName)
       const filteredUsers = usersData.filter(
         (user) =>
-          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.displayName.toLowerCase().includes(searchTerm.toLowerCase()),
+          user.role === "participant" &&
+          (user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            user.displayName.toLowerCase().includes(searchTerm.toLowerCase())),
       );
 
       setUsers(filteredUsers);
@@ -131,7 +134,7 @@ const AssignUserToTeamModal = ({
 
   return (
     <Modal
-      title="Assign User to Team"
+      title="Assign Participant to Team"
       open={isOpen}
       onOk={handleSubmit}
       onCancel={handleCancel}
@@ -142,12 +145,12 @@ const AssignUserToTeamModal = ({
       <Form form={form} layout="vertical" name="assignUserToTeam">
         <Form.Item
           name="userId"
-          label="User"
-          rules={[{ required: true, message: "Please select a user" }]}
+          label="Participant"
+          rules={[{ required: true, message: "Please select a participant" }]}
         >
           <Select
             showSearch
-            placeholder="Search user by email or name"
+            placeholder="Search participant by email or name"
             loading={isLoadingUsers}
             onSearch={setUserSearchValue}
             filterOption={false}
@@ -156,7 +159,7 @@ const AssignUserToTeamModal = ({
                 ? "Type at least 2 characters to search"
                 : isLoadingUsers
                   ? "Loading..."
-                  : "No users found"
+                  : "No participants found"
             }
           >
             {users.map((user) => (

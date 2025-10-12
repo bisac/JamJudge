@@ -55,6 +55,11 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       "/participant/project",
       <ProjectOutlined />,
     ),
+    getItem(
+      <Link to="/participant/settings">Settings</Link>,
+      "/participant/settings",
+      <SettingOutlined />,
+    ),
   ];
 
   const juryItems: MenuItem[] = [
@@ -72,6 +77,11 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       <Link to="/jury/results">Results</Link>,
       "/jury/results",
       <TrophyOutlined />,
+    ),
+    getItem(
+      <Link to="/jury/settings">Settings</Link>,
+      "/jury/settings",
+      <SettingOutlined />,
     ),
   ];
 
