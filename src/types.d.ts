@@ -119,6 +119,8 @@ export interface CriterionDoc {
 export interface PublicResultDoc {
   eventId: string;
   projectId: string; // docId mirrors projectId
+  projectName: string; // Denormalized from ProjectDoc
+  teamName: string; // Denormalized from TeamDoc
   totalScore: number;
   rank: number | null;
   updatedAt: Timestamp;
@@ -249,7 +251,13 @@ export type CriterionDTO = WithId<
 export type PublicResultDTO = WithId<
   Pick<
     PublicResultDoc,
-    "eventId" | "projectId" | "totalScore" | "rank" | "updatedAt"
+    | "eventId"
+    | "projectId"
+    | "projectName"
+    | "teamName"
+    | "totalScore"
+    | "rank"
+    | "updatedAt"
   >
 >;
 
@@ -427,4 +435,16 @@ export interface EventContextType {
   };
   isLoading: boolean;
   error: Error | null;
+}
+
+// ------------------------------------------------------
+// Leaderboard-specific types
+// ------------------------------------------------------
+
+export interface LeaderboardEntryViewModel {
+  id: string; // Project ID
+  rank: number | null;
+  projectName: string; // Denormalized from ProjectDoc
+  teamName: string; // Denormalized from TeamDoc
+  totalScore: number;
 }

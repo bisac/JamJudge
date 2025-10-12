@@ -18,6 +18,7 @@ import {
   CloudServerOutlined,
 } from "@ant-design/icons";
 import { useAuthContext } from "../../hooks/useAuthContext";
+import { useEventContext } from "../../hooks/useEventContext";
 import type { UserRole } from "../../types";
 
 const { Sider } = Layout;
@@ -38,7 +39,7 @@ function getItem(
   } as MenuItem;
 }
 
-const getMenuItems = (role: UserRole): MenuItem[] => {
+const getMenuItems = (role: UserRole, showLeaderboard: boolean): MenuItem[] => {
   const participantItems: MenuItem[] = [
     getItem(
       <Link to="/participant/dashboard">Dashboard</Link>,
@@ -55,6 +56,15 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       "/participant/project",
       <ProjectOutlined />,
     ),
+    ...(showLeaderboard
+      ? [
+          getItem(
+            <Link to="/leaderboard">Leaderboard</Link>,
+            "/leaderboard",
+            <TrophyOutlined />,
+          ),
+        ]
+      : []),
     getItem(
       <Link to="/participant/settings">Settings</Link>,
       "/participant/settings",
@@ -74,10 +84,19 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
       <AuditOutlined />,
     ),
     getItem(
-      <Link to="/jury/results">Results</Link>,
+      <Link to="/jury/results">My Evaluations</Link>,
       "/jury/results",
       <TrophyOutlined />,
     ),
+    ...(showLeaderboard
+      ? [
+          getItem(
+            <Link to="/leaderboard">Leaderboard</Link>,
+            "/leaderboard",
+            <TrophyOutlined />,
+          ),
+        ]
+      : []),
     getItem(
       <Link to="/jury/settings">Settings</Link>,
       "/jury/settings",
@@ -159,12 +178,15 @@ const getMenuItems = (role: UserRole): MenuItem[] => {
 
 const AppSider = () => {
   const { user } = useAuthContext();
+  const { event } = useEventContext();
   const location = useLocation();
+
+  const showLeaderboard = !!(event && event.resultsPublishedAt);
 
   const menuItems = useMemo(() => {
     if (!user?.role) return [];
-    return getMenuItems(user.role);
-  }, [user?.role]);
+    return getMenuItems(user.role, showLeaderboard);
+  }, [user?.role, showLeaderboard]);
 
   // Flatten all menu items including children for selectedKey calculation
   const flattenedItems = useMemo(() => {

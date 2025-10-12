@@ -2,57 +2,257 @@ import React, { useEffect, useState } from "react";
 import { Layout, Typography, Table, Card, Result, Spin, Button } from "antd";
 import { TrophyOutlined, HomeOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, limit, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
-import { useEventContext } from "../../hooks/useEventContext";
-import type { PublicResultDTO } from "../../types";
+import { useLeaderboardData } from "../../hooks/useLeaderboardData";
+import useMediaQuery from "../../hooks/useMediaQuery";
+import type { LeaderboardEntryViewModel, EventDTO } from "../../types";
 
 const { Content } = Layout;
 const { Title } = Typography;
 
-interface LeaderboardEntry extends PublicResultDTO {
-  projectName?: string;
-  teamName?: string;
-}
+/**
+ * Placeholder component shown when results are not yet published
+ */
+const ResultsNotPublishedPlaceholder: React.FC = () => {
+  const navigate = useNavigate();
 
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Content
+        style={{
+          padding: "50px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Result
+          icon={<TrophyOutlined />}
+          status="info"
+          title="Results Not Yet Published"
+          subTitle="The event results will be available here once the organizer publishes them. Please check back later!"
+          extra={
+            <Button
+              type="primary"
+              icon={<HomeOutlined />}
+              onClick={() => navigate("/")}
+            >
+              Go to Home
+            </Button>
+          }
+        />
+      </Content>
+    </Layout>
+  );
+};
+
+/**
+ * Leaderboard table component with pagination
+ */
+const LeaderboardTable: React.FC<{
+  eventId: string;
+  eventName: string;
+  publishedAt: Date;
+}> = ({ eventId, eventName, publishedAt }) => {
+  const navigate = useNavigate();
+  const { results, isLoading, error } = useLeaderboardData(eventId);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  if (error) {
+    return (
+      <Layout style={{ minHeight: "100vh" }}>
+        <Content style={{ padding: isMobile ? "20px" : "50px" }}>
+          <Result
+            status="error"
+            title="Error Loading Leaderboard"
+            subTitle="There was a problem loading the leaderboard. Please try again later."
+            extra={
+              <Button type="primary" onClick={() => window.location.reload()}>
+                Reload Page
+              </Button>
+            }
+          />
+        </Content>
+      </Layout>
+    );
+  }
+
+  // Desktop columns - all columns visible
+  const desktopColumns = [
+    {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+      width: 80,
+      render: (rank: number | null) => {
+        if (rank === 1) return "🥇";
+        if (rank === 2) return "🥈";
+        if (rank === 3) return "🥉";
+        return rank || "-";
+      },
+    },
+    {
+      title: "Project",
+      dataIndex: "projectName",
+      key: "projectName",
+      render: (name: string) => name,
+    },
+    {
+      title: "Team",
+      dataIndex: "teamName",
+      key: "teamName",
+      render: (name: string) => name,
+    },
+    {
+      title: "Total Score",
+      dataIndex: "totalScore",
+      key: "totalScore",
+      width: 150,
+      render: (score: number) => score.toFixed(2),
+    },
+  ];
+
+  // Mobile columns - compact view
+  const mobileColumns = [
+    {
+      title: "Rank",
+      dataIndex: "rank",
+      key: "rank",
+      width: 60,
+      render: (rank: number | null) => {
+        if (rank === 1) return "🥇";
+        if (rank === 2) return "🥈";
+        if (rank === 3) return "🥉";
+        return rank || "-";
+      },
+    },
+    {
+      title: "Project / Team",
+      dataIndex: "projectName",
+      key: "projectName",
+      render: (name: string, record: LeaderboardEntryViewModel) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{name}</div>
+          <div style={{ fontSize: "12px", color: "#888" }}>
+            {record.teamName}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "Score",
+      dataIndex: "totalScore",
+      key: "totalScore",
+      width: 80,
+      render: (score: number) => score.toFixed(2),
+    },
+  ];
+
+  const columns = isMobile ? mobileColumns : desktopColumns;
+
+  return (
+    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
+      <Content
+        style={{
+          padding: isMobile ? "16px" : "24px 50px",
+          maxWidth: 1200,
+          margin: "0 auto",
+          width: "100%",
+        }}
+      >
+        <div style={{ marginBottom: isMobile ? 16 : 24 }}>
+          <Button
+            icon={<HomeOutlined />}
+            onClick={() => navigate("/")}
+            size={isMobile ? "small" : "middle"}
+          >
+            {isMobile ? "Home" : "Back to Home"}
+          </Button>
+        </div>
+
+        <Card>
+          <div
+            style={{ textAlign: "center", marginBottom: isMobile ? 16 : 32 }}
+          >
+            <TrophyOutlined
+              style={{
+                fontSize: isMobile ? 36 : 48,
+                color: "#faad14",
+              }}
+            />
+            <Title
+              level={isMobile ? 3 : 2}
+              style={{
+                marginTop: isMobile ? 8 : 16,
+                marginBottom: isMobile ? 4 : 8,
+              }}
+            >
+              {isMobile ? "Leaderboard" : `${eventName} - Leaderboard`}
+            </Title>
+            <p style={{ color: "#666", fontSize: isMobile ? "12px" : "14px" }}>
+              Published on {publishedAt.toLocaleString()}
+            </p>
+          </div>
+
+          <Table<LeaderboardEntryViewModel>
+            dataSource={results}
+            columns={columns}
+            rowKey="id"
+            loading={isLoading}
+            pagination={{
+              pageSize: 20,
+              showSizeChanger: false,
+              showTotal: (total) => `Total ${total} projects`,
+              simple: isMobile, // Simple pagination for mobile
+            }}
+            locale={{
+              emptyText: "No results available",
+            }}
+            scroll={isMobile ? { x: "max-content" } : undefined}
+          />
+        </Card>
+      </Content>
+    </Layout>
+  );
+};
+
+/**
+ * Public Leaderboard Page
+ * Displays event results after they have been published by the organizer
+ */
 const LeaderboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { event, isLoading: eventLoading } = useEventContext();
-  const [results, setResults] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [event, setEvent] = useState<EventDTO | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch event data directly (without EventContext for public route)
   useEffect(() => {
-    if (!event) return;
-
-    const loadResults = async () => {
-      setLoading(true);
+    const fetchEvent = async () => {
       try {
-        const resultsQuery = query(
-          collection(db, "publicResults"),
-          orderBy("rank", "asc"),
-        );
-        const snapshot = await getDocs(resultsQuery);
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as LeaderboardEntry[];
-
-        setResults(data);
+        const eventsQuery = query(collection(db, "events"), limit(1));
+        const snapshot = await getDocs(eventsQuery);
+        if (!snapshot.empty) {
+          const eventDoc = snapshot.docs[0];
+          setEvent({
+            id: eventDoc.id,
+            ...eventDoc.data(),
+          } as EventDTO);
+        }
       } catch (error) {
-        console.error("Error loading leaderboard:", error);
+        console.error("Error fetching event:", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
-    if (event.resultsPublishedAt) {
-      loadResults();
-    } else {
-      setLoading(false);
-    }
-  }, [event]);
+    fetchEvent();
+  }, []);
 
-  if (eventLoading || loading) {
+  const areResultsPublished = !!(event && event.resultsPublishedAt);
+
+  // Loading state
+  if (isLoading) {
     return (
       <div
         style={{
@@ -67,6 +267,7 @@ const LeaderboardPage: React.FC = () => {
     );
   }
 
+  // No event found
   if (!event) {
     return (
       <Layout style={{ minHeight: "100vh" }}>
@@ -86,118 +287,18 @@ const LeaderboardPage: React.FC = () => {
     );
   }
 
-  if (!event.resultsPublishedAt) {
-    return (
-      <Layout style={{ minHeight: "100vh" }}>
-        <Content
-          style={{
-            padding: "50px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Result
-            icon={<TrophyOutlined />}
-            status="info"
-            title="Results Not Yet Published"
-            subTitle="The event results will be available here once the organizer publishes them. Please check back later!"
-            extra={
-              <Button
-                type="primary"
-                icon={<HomeOutlined />}
-                onClick={() => navigate("/")}
-              >
-                Go to Home
-              </Button>
-            }
-          />
-        </Content>
-      </Layout>
-    );
+  // Results not published yet
+  if (!areResultsPublished) {
+    return <ResultsNotPublishedPlaceholder />;
   }
 
-  const columns = [
-    {
-      title: "Rank",
-      dataIndex: "rank",
-      key: "rank",
-      width: 80,
-      render: (rank: number | null) => {
-        if (rank === 1) return "🥇";
-        if (rank === 2) return "🥈";
-        if (rank === 3) return "🥉";
-        return rank || "-";
-      },
-    },
-    {
-      title: "Project",
-      dataIndex: "projectName",
-      key: "projectName",
-      render: (name: string | undefined, record: LeaderboardEntry) =>
-        name || `Project ${record.projectId}`,
-    },
-    {
-      title: "Team",
-      dataIndex: "teamName",
-      key: "teamName",
-      render: (name: string | undefined) => name || "-",
-    },
-    {
-      title: "Total Score",
-      dataIndex: "totalScore",
-      key: "totalScore",
-      width: 150,
-      render: (score: number) => score.toFixed(2),
-    },
-  ];
-
+  // Display leaderboard
   return (
-    <Layout style={{ minHeight: "100vh", background: "#f0f2f5" }}>
-      <Content
-        style={{
-          padding: "24px 50px",
-          maxWidth: 1200,
-          margin: "0 auto",
-          width: "100%",
-        }}
-      >
-        <div style={{ marginBottom: 24 }}>
-          <Button icon={<HomeOutlined />} onClick={() => navigate("/")}>
-            Back to Home
-          </Button>
-        </div>
-
-        <Card>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <TrophyOutlined style={{ fontSize: 48, color: "#faad14" }} />
-            <Title level={2} style={{ marginTop: 16, marginBottom: 8 }}>
-              {event.name} - Leaderboard
-            </Title>
-            {event.resultsPublishedAt && (
-              <p style={{ color: "#666" }}>
-                Published on{" "}
-                {new Date(event.resultsPublishedAt.toDate()).toLocaleString()}
-              </p>
-            )}
-          </div>
-
-          <Table
-            dataSource={results}
-            columns={columns}
-            rowKey="id"
-            pagination={{
-              pageSize: 20,
-              showSizeChanger: false,
-              showTotal: (total) => `Total ${total} projects`,
-            }}
-            locale={{
-              emptyText: "No results available",
-            }}
-          />
-        </Card>
-      </Content>
-    </Layout>
+    <LeaderboardTable
+      eventId={event.id}
+      eventName={event.name}
+      publishedAt={event.resultsPublishedAt!.toDate()}
+    />
   );
 };
 
