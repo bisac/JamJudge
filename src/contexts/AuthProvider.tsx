@@ -60,8 +60,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             );
             setUserProfile(profile);
           } else {
-            // Handle case where user exists in Auth but not in Firestore
-            // Set user profile to null - this will be handled by RequireAuth
+            // No profile doc
             console.warn(
               "[AuthProvider] User profile not found in Firestore. User may need activation.",
             );
@@ -71,7 +70,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         },
         (error) => {
           console.error("[AuthProvider] Error fetching user profile:", error);
-          // In case of error, set profile to null
           setUserProfile(null);
           setIsLoading(false);
         },
