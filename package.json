@@ -9,14 +9,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "format": "prettier --write .",
-    "lint:fix": "eslint . --fix",
-    "check-types": "tsc -b --pretty false",
-    "prepare": "husky"
+    "test:e2e": "firebase --config firebase.test.json emulators:exec --only auth,firestore --project demo-test 'playwright test -c e2e/playwright.config.ts'"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.3.7",
     "antd": "^5.27.4",
     "antd-mobile": "^5.41.1",
     "antd-mobile-icons": "^0.3.0",
@@ -27,6 +25,7 @@
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.2",
     "@eslint/js": "^9.36.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
@@ -38,10 +37,12 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.3",
-    "prettier": "^3.6.2",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.44.0",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "node-fetch": "^2.7.0",
+    "playwright": "^1.44.1"
   }
 }

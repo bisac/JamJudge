@@ -1,6 +1,6 @@
 {
   "firestore": {
-    "rules": "firestore.rules",
+    "rules": "firestore.test.rules",
     "indexes": "firestore.indexes.json"
   },
   "functions": [
@@ -43,4 +43,3 @@
     "singleProjectMode": true
   }
 }
-
