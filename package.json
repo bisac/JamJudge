@@ -27,6 +27,7 @@
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.4",
     "@playwright/test": "^1.48.2",
     "@testing-library/jest-dom": "^6.4.8",
     "@testing-library/react": "^16.0.0",
