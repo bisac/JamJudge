@@ -1,15 +1,46 @@
-# E2E Test Implementation Plan (Firebase Emulators)
+# Test Plan: E2E and Unit Tests
 
 ## Overview
-This plan defines E2E tests implemented with Playwright Test and Firebase Emulators. The scope focuses on authentication flows and public leaderboard, maximizing stability with real Firebase SDK behavior.
+This plan defines the testing strategy for JamJudge, covering both end-to-end (E2E) tests with Playwright and unit tests with Vitest. The scope focuses on authentication flows and public leaderboard, maximizing stability with real Firebase SDK behavior for E2E and isolated logic verification for unit tests.
 
 ## Technology
 - **Playwright Test** (TypeScript) - E2E testing framework
+- **Vitest + React Testing Library** - Unit and component testing
 - **Firebase Emulators** - Auth (port 9098) + Firestore (port 8081)
 - **Vite Dev Server** - App served on port 5173
-- **Data Seeding** - Firestore REST API for test data setup
+- **Data Seeding** - Firestore REST API for E2E test data setup
 
-## Test Scenarios
+---
+
+## Unit Tests (Vitest + React Testing Library)
+
+To complement the E2E tests, a suite of unit tests has been implemented to verify individual components and utility functions in isolation. This approach ensures that core logic is sound, components render correctly under various conditions, and tests run quickly without reliance on external services like emulators.
+
+### 1. ✅ Firebase Error Message Utility (`src/utils/firebaseErrors.test.ts`)
+**Status:** Implemented
+
+Tests the `getAuthErrorMessage` utility function to ensure that Firebase authentication error codes are correctly mapped to user-friendly messages in Polish. This guarantees consistent and clear error communication to the user.
+
+### 2. ✅ Login Page Component (`src/pages/auth/LoginPage.test.tsx`)
+**Status:** Implemented
+
+Covers the `LoginPage` component's functionality, including:
+- Correct rendering of form inputs and buttons.
+- Successful form submission and calling the login handler with correct credentials.
+- Displaying an appropriate error message upon a failed login attempt.
+
+### 3. ✅ Leaderboard Page Component (`src/pages/public/LeaderboardPage.test.tsx`)
+**Status:** Implemented
+
+Verifies the different states of the `LeaderboardPage`:
+- Displays a loading state while fetching data.
+- Shows a "not found" message if no event is available.
+- Renders a placeholder when results are not yet published.
+- Correctly displays the leaderboard table with mock data, validating the component's rendering logic independently of the flaky E2E data seeding process.
+
+---
+
+## E2E Test Scenarios
 
 ### 1. ✅ Login – Invalid Credentials (IMPLEMENTED)
 **Status:** Fully working
@@ -240,8 +271,12 @@ scripts/cleanup-e2e.sh             # Process cleanup utility
 
 ## Summary
 
-**Implemented:** 1 fully working test (login error)
-**Partial:** 1 test with seeding (leaderboard)
-**Skipped:** 1 complex scenario (pending activation)
+**E2E Tests:**
+- **Implemented:** 1 fully working test (login error)
+- **Partial:** 1 test with seeding (leaderboard)
+- **Skipped:** 1 complex scenario (pending activation)
 
-**Result:** Functional E2E test suite with room for growth. Focus on simple, stable tests rather than comprehensive but fragile coverage.
+**Unit Tests:**
+- **Implemented:** 3 working tests (`firebaseErrors`, `LoginPage`, `LeaderboardPage`).
+
+**Result:** A dual-layer test suite that combines broad integration coverage (E2E) with fast, specific checks (unit tests). This improves reliability and development speed.
