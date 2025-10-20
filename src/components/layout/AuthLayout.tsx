@@ -1,9 +1,9 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { Layout, Typography } from "antd";
+import logo from "/logo.png";
 
 const { Content } = Layout;
-const { Title } = Typography;
 
 const AuthLayout: React.FC = () => {
   return (
@@ -29,9 +29,11 @@ const AuthLayout: React.FC = () => {
             marginBottom: 24,
           }}
         >
-          <Title level={2} style={{ marginBottom: 8 }}>
-            JamJudge
-          </Title>
+          <img
+            src={logo}
+            alt="JamJudge Logo"
+            style={{ height: 64, marginBottom: 8 }}
+          />
           <Typography.Text type="secondary">
             System oceniania projektów hackathonowych
           </Typography.Text>
